@@ -21,17 +21,23 @@ export const createPlaylistTracks = async (playlistId, trackId) => {
 }
 
 export const getTracks = async () => {
-  const sql = `
-    SELECT * FROM tracks
-  `;
+  const sql = `SELECT * FROM tracks`;
   const { rows: tracks } = await db.query(sql);
   return tracks;
 }
 
 export const getTrack = async (id) => {
-  const sql = `
-    SELECT * FROM tracks WHERE id=$1
-  `;
+  const sql = `SELECT * FROM tracks WHERE id=$1`;
   const { rows: [track] } = await db.query(sql, [id]);
   return track;
+}
+
+export const addTrack = async (name, durationMs, id) => {
+  const sql = `
+    INSERT INTO tracks (name, durationMs, id)
+    VALUES ($1,$2,$3)
+    RETURNING *
+  `;
+  const { rows: [newTrack] } = await db.query(sql, [name, durationMs, id]);
+  return newTrack;
 }
