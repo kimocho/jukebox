@@ -32,12 +32,22 @@ export const getTrack = async (id) => {
   return track;
 }
 
-export const addTrack = async (name, durationMs, id) => {
+export const addTrack = async (name, durationMs) => {
   const sql = `
-    INSERT INTO tracks (name, durationMs, id)
-    VALUES ($1,$2,$3)
+    INSERT INTO tracks (name, durationMs)
+    VALUES ($1,$2)
     RETURNING *
   `;
-  const { rows: [newTrack] } = await db.query(sql, [name, durationMs, id]);
+  const { rows: [newTrack] } = await db.query(sql, [name, durationMs]);
   return newTrack;
+}
+
+export async function createPlaylistTrack(playlistId, trackId) {
+  const sql = `
+    INSERT INTO playlists_tracks (playlist_id, track_id)
+    VALUES ($1, $2)
+    RETURNING *
+  `;
+  const { rows: [playlistTrack] } = await db.query(sql, [playlistId, trackId]);
+  return playlistTrack;
 }
