@@ -1,5 +1,5 @@
 import { getPlaylists, getPlaylist, newPlaylist } from "#db/queries/playlist";
-import { getTrack, addTrack, createPlaylistTrack, getTracksByPlaylist } from "#db/queries/tracks";
+import { getTrack, addTrack, getTracksByPlaylist } from "#db/queries/tracks";
 import express from "express";
 const playlistRouter = express.Router();
 
@@ -33,11 +33,20 @@ playlistRouter.get('/:id/tracks', async (req, res) => {
 
 playlistRouter.post('/:id/tracks', async (req, res) => {
   const { id } = req.params;
+  if (!+id) return res.status(400).send('not a number');
   const playlist = await getPlaylist(+id);
   if (!playlist) return res.status(404).send('not found');
-  if (!req.body || !req.body.id || !req.body.trackId) return res.status(400).send('no request body or required fields');
-  if (!+id) return res.status(400).send('not a number');
-  const newTrack = await addTrack(playlist[+id], req.body.trackId);
+  if (!req.body || !playlist.id || !req.body.trackId) return res.status(400).send('no request body or required fields');
+  if (!+req.body.trackId) return res.status(400).send('not a number')
+
+  const testTrack = await getTrack(req.body.trackId);
+  if (!testTrack) return res.status(400).send('notexist');
+
+  const arrayOfTracks = await getTracksByPlaylist(+id);
+  arrayOfTracks.forEach((eachTrack) => {
+    if (eachTrack.id === req.body.trackId) return res.status(400).send('already exists');
+  });
+  const newTrack = await addTrack(playlist.id, req.body.trackId);
   res.status(201).send(newTrack);
 });
 

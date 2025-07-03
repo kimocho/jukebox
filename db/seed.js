@@ -1,5 +1,5 @@
 import db from "#db/client";
-import { createPlaylistTracks, createTrack, getTracksByPlaylist } from "./queries/tracks.js";
+import { createPlaylistTrack, createTrack } from "./queries/tracks.js";
 import { createPlaylist } from "./queries/playlist.js";
 
 async function seed() {
@@ -11,10 +11,9 @@ async function seed() {
   }
   for (let i = 1; i <= 15; i++) {
     const playlistId = 1 + Math.floor(i / 2);
-    await createPlaylistTracks(playlistId, i);
+    await createPlaylistTrack(playlistId, i);
   }
 
-  console.log(await getTracksByPlaylist(2));
   // const track1 = await createTrack('what_do_you_mean', 5);
   // const track2 = await createTrack('never_say_never', 3);
   // const track3 = await createTrack('cruel_summer', 4);

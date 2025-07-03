@@ -30,7 +30,6 @@ export const getTracksByPlaylist = async (id) => {
     WHERE playlists.id = $1
   `;
   const { rows: tracks } = await db.query(sql, [id]);
-  console.log('trackssss', tracks);
   return tracks;
 }
 
@@ -42,4 +41,18 @@ export const addTrack = async (playlistId, trackId) => {
   `;
   const { rows: [newTrack] } = await db.query(sql, [playlistId, trackId]);
   return newTrack;
+}
+
+export async function createPlaylistTrack(playlistId, trackId) {
+  const sql = `
+  INSERT INTO playlists_tracks
+    (playlist_id, track_id)
+  VALUES
+    ($1, $2)
+  RETURNING *
+  `;
+  const {
+    rows: [playlistTrack],
+  } = await db.query(sql, [playlistId, trackId]);
+  return playlistTrack;
 }
